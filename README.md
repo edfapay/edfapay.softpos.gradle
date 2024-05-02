@@ -1,3 +1,9 @@
+<p align="center">
+  <a href="https://edfapay.com">
+      <img src="https://github.com/edfapay/edfapay.softpos.gradle/blob/master/header.jpg" alt="EdfaPg" width="400px"/>
+  </a>
+</p>
+
 # EdfaPay SoftPOS Gradle Plugin
 This Plugin helps developer to install the EdfaPay SoftPos SDK and apply configurations to the project followed by their partner code.
 
