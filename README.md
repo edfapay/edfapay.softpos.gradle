@@ -7,8 +7,6 @@ This Plugin helps developer to install the EdfaPay SoftPos SDK and apply configu
   </a>
 </p>
 
-***
-
 ### Configure Your Partner Code
 The **partner code** will be provided by EdfaPay, Developer should set the partner code to an environment variable as gradle script take it from their and perform the required task to configure and install SDK in to your project.
  - Variable should named as **EDFAPAY_PARTNER**
