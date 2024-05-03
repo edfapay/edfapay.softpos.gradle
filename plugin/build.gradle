@@ -35,7 +35,7 @@ dependencies {
 
 
 group = 'com.edfapay.softpos'
-version = '0.0.4'
+version = '0.0.5'
 
 
 
@@ -56,3 +56,13 @@ gradlePlugin {
         }
     }
 }
+
+
+/*
+Files will be download plugin
+-------------------------------
+https://plugins.gradle.org/m2/com/edfapay/softpos/plugin/0.0.5/plugin-0.0.5.pom
+https://plugins.gradle.org/m2/com/edfapay/softpos/plugin/0.0.5/plugin-0.0.5.module
+https://plugins.gradle.org/m2/com/edfapay/softpos/plugin/0.0.5/plugin-0.0.5.jar
+https://plugins.gradle.org/m2/com/edfapay/softpos/plugin/0.0.5/plugin-0.0.5-sources.jar
+* */
