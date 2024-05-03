@@ -18,6 +18,8 @@ repositories {
 }
 
 dependencies {
+    implementation gradleTestKit()
+
     // Align versions of all Kotlin components
     implementation platform('org.jetbrains.kotlin:kotlin-bom')
 
@@ -33,13 +35,13 @@ dependencies {
 
 
 group = 'com.edfapay.softpos'
-version = '0.0.1'
+version = '0.0.4'
 
 
 
 pluginBundle {
     website = 'https://edfapay.com'
-    vcsUrl = 'https://edfapay.com'
+    vcsUrl = 'https://github.com/edfapay/edfapay.softpos.gradle'
     tags = ['edfapay', 'edfapay gradle', 'edfapay tools plugins', 'edfapay tools gradle', 'edfapay softpos configuration', 'edfapay softpos partners configs']
 }
 
@@ -54,4 +56,3 @@ gradlePlugin {
         }
     }
 }
-
