@@ -40,8 +40,17 @@ Invalid partner code
 
     val invalidPartnerCodeToInstall = Exception(
         """
-Invalid or missing partner code in build script at edfapay.softpos.install(partnerCode:String)"
+Invalid or missing partner code in `script function edfapay.softpos.install(partnerCode:String)` or `system environment`"
 - Please contact EdfaPay Administration or Sales for the correct partner code generated for your.
+ - Contact Detail:
+  - Email: info@edfapay.com/zohaib.kambrani@edfapay.com
+  - Messenger: +966500409598 (WhatsApp Only) 
+""")
+
+    val invalidAuthorizationToInstall = Exception(
+        """
+Invalid or missing 'authorization' token in build script at edfapay.softpos.install(partnerCode:String, authorization:String)"
+- Please contact EdfaPay Administration or Sales for the correct 'authorization' token generated for your.
  - Contact Detail:
   - Email: info@edfapay.com/zohaib.kambrani@edfapay.com
   - Messenger: +966500409598 (WhatsApp Only) 

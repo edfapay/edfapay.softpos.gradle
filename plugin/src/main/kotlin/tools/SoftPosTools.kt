@@ -6,39 +6,41 @@ package tools
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.artifacts.repositories.MavenArtifactRepository
+import org.gradle.api.initialization.resolve.RepositoriesMode
 import org.gradle.api.tasks.TaskExecutionException
 import java.io.File
+import java.net.URI
 
 
 /**
  * A simple 'hello world' plugin.
  */
 enum class Mode{
-    development, production, local
+    development, production
 }
 
 class SoftPosToolsExtension(private val project:Project) {
     var mode:Mode = Mode.production
-    var type:String = "release"
     var dependency:String? = null
     private var partnerName:String? = null
 
     val currentTask:Task get() = project.tasks.getByName("edfapay")
 
-    fun install(partnerCode:String){
-        println("Installing edfapay sdk with parameters: mode:$mode | type:$type | partnerCode:$partnerCode")
+    fun install(partnerCode:String?){
+        println("Installing edfapay sdk with parameters: mode:$mode | partnerCode:$partnerCode")
 
-        partnerName = Helper.hexToPartnerCode(partnerCode) ?: throw TaskExecutionException(currentTask, Errors.invalidPartnerCodeToInstall)
+        val partnerCode_ = partnerCode?.let { it } ?: System.getenv().get("EDFAPAY_PARTNER")
+        this.partnerName = Helper.hexToPartnerCode(partnerCode_ ?: "") ?: throw TaskExecutionException(currentTask, Errors.invalidPartnerCodeToInstall)
         if(!partnerName!!.startsWith("partner~")){
             throw TaskExecutionException(currentTask, Errors.invalidPartnerCodeToInstall)
         }
 
+        partnerName = partnerName?.replace("partner~", "")
+
         when(dependency == null) {
             true -> {
-                dependency = when (this.mode) {
-                    Mode.local -> "com.edfapay:card-sdk:1.0.1"
-                    else -> "com.github.edfapay:android-edfapay-softpos-sdk:$mode-SNAPSHOT"
-                }
+                dependency = "com.github.edfapay.android-edfapay-softpos-sdk:$partnerName:$mode-SNAPSHOT"
             }
             false -> {
                 println("⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯")
@@ -49,16 +51,14 @@ class SoftPosToolsExtension(private val project:Project) {
         println("⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯")
         println("Partner:       ︳ $partnerName")
         println("Mode:          ︳ ${this.mode}")
-        println("Type:          ︳ ${this.type}")
         println("Dependency:    ︳ $dependency")
         println("⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯")
 
         dependency?.let {
-            project.dependencies.add("implementEdfapay", it)
+//            project.dependencies.add("implementEdfapay", it)
             project.dependencies.add("implementation", it)
         } ?: throw TaskExecutionException(currentTask, Errors.dependencyIsNull)
 
-        configurePartner()
     }
 
     private fun configurePartner(){
@@ -108,9 +108,9 @@ class SoftPosTools: Plugin<Project> {
     override fun apply(project: Project) {
         project.tasks.register("edfapay") { task ->
             task.extensions.add("softpos", SoftPosToolsExtension(project))
-            project.configurations.create("implementEdfapay"){
-                it.isCanBeResolved = true
-            }
+//            project.configurations.create("implementEdfapay"){
+//                it.isCanBeResolved = true
+//            }
         }
     }
 }
