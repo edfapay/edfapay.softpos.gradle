@@ -29,53 +29,34 @@ WINDOWS:
 """
     )
 
-    val invalidPartnerCode = Exception(
-        """
-Invalid partner code
-- Please contact EdfaPay Administration or Sales for the correct partner code generated for your.
- - Contact Detail:
-  - Email: info@edfapay.com/zohaib.kambrani@edfapay.com
-  - Messenger: +966500409598 (WhatsApp Only) 
-""")
-
     val invalidPartnerCodeToInstall = Exception(
         """
-Invalid or missing partner code in `script function edfapay.softpos.install(partnerCode:String)` or `system environment`"
+Partner Code is not configured to variable or property named `EDFAPAY_PARTNER` at below:"
+- System Environment Variable
+- ~/.gradle/gradle.properties
+- ./gradle.properties
+Please configure the partner code at one of the above. 
+
 - Please contact EdfaPay Administration or Sales for the correct partner code generated for your.
  - Contact Detail:
   - Email: info@edfapay.com/zohaib.kambrani@edfapay.com
   - Messenger: +966500409598 (WhatsApp Only) 
 """)
 
-    val invalidAuthorizationToInstall = Exception(
+    val invalidSdkVersionOrModeToInstall = Exception(
         """
-Invalid or missing 'authorization' token in build script at edfapay.softpos.install(partnerCode:String, authorization:String)"
-- Please contact EdfaPay Administration or Sales for the correct 'authorization' token generated for your.
- - Contact Detail:
-  - Email: info@edfapay.com/zohaib.kambrani@edfapay.com
-  - Messenger: +966500409598 (WhatsApp Only) 
-""")
+SDK Version or Mode is not configured to variable or property named `EDFAPAY_SDK_VERSION or EDFAPAY_SDK_MODE` at below:"
+- System Environment Variable
+- ~/.gradle/gradle.properties
+- ./gradle.properties
 
-    val invalidModeSetByGradleScript = Exception(
-        """
-Invalid `mode` value sent to plugin from gradle script
-- possible values are
-  - development
-  - production
-  - local (not for external developer)
-""")
-
-    val invalidTypeSetByGradleScript = Exception(
-        """
-Invalid `type` value sent to plugin from gradle script
-- possible values are
-  - release
-  - debug
+Please configure the `SDK Version or Mode` at one of the above.
+- If the `EDFAPAY_SDK_VERSION` is configured the mode will be skipped and version will applied
+- If the `EDFAPAY_SDK_MODE` is configured and `EDFAPAY_SDK_VERSION` not the mode will applied
 """)
 
 
 
     val dependencyIsNull = Exception("""Error generating dependency, Its `null`""")
 
-    val invalidInstallArgument = Exception("Missing/Invalid argument to edfapay.softpos.install(mode:String, buildType:String)")
 }

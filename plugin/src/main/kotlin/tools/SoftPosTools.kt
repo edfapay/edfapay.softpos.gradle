@@ -15,19 +15,20 @@ import java.io.File
  */
 
 class SoftPosToolsExtension(private val project:Project) {
-    var mode:String? = null
+    var partnerCode:String? = null
     var version:String? = null
+    var mode:String? = null
     var dependency:String? = null
     private var partnerName:String? = null
 
     val currentTask:Task get() = project.tasks.getByName("edfapay")
 
     fun install(partnerCode:String?){
-        val partnerCode_ = lookForPartnerCode(partnerCode)
+        val partnerCode_ = lookForPartnerCode(partnerCode ?: this.partnerCode) ?: throw TaskExecutionException(currentTask, Errors.invalidPartnerCodeToInstall)
         val mode = lookForSdkMode(mode)
         val version = lookForSdkVersion(version)
 
-        this.partnerName = Helper.hexToPartnerCode(partnerCode_ ?: "") ?: throw TaskExecutionException(currentTask, Errors.invalidPartnerCodeToInstall)
+        this.partnerName = Helper.hexToPartnerCode(partnerCode_) ?: throw TaskExecutionException(currentTask, Errors.invalidPartnerCodeToInstall)
         if(!partnerName!!.startsWith("partner~")){
             throw TaskExecutionException(currentTask, Errors.invalidPartnerCodeToInstall)
         }
@@ -37,25 +38,25 @@ class SoftPosToolsExtension(private val project:Project) {
         when(dependency == null) {
             true -> {
                 val depStr = "com.github.edfapay.android-edfapay-softpos-sdk"
-                if(version == null){
-                    println("Installing edfapay sdk with parameters: mode:$mode | partnerCode:$partnerCode_")
-                    dependency = "$depStr:$partnerName:$mode-SNAPSHOT"
-                }else{
+                version?.let {
                     println("Skipping `mode` as `version` number exists...")
-                    println("Installing edfapay sdk with parameters: version:$version | partnerCode:$partnerCode_")
-                    dependency = "$depStr:$partnerName:$version"
-                }
+                    println("Installing edfapay sdk with parameters: version:$it | partnerCode:$partnerCode_")
+                    dependency = "$depStr:$partnerName:$it"
+                } ?: mode?.let {
+                    println("Installing edfapay sdk with parameters: mode:$it | partnerCode:$partnerCode_")
+                    dependency = "$depStr:$partnerName:$it-SNAPSHOT"
+                } ?: throw TaskExecutionException(currentTask, Errors.invalidSdkVersionOrModeToInstall)
 
             }
             false -> {
                 println("⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯")
                 println("Dependency override: $dependency")
-                println(" - `Mode` and `Partner` cannot be considered to create `dependency`")
+                println(" - `Mode/Version` and `Partner Code` cannot be considered to create `dependency`")
             }
         }
         println("⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯")
         println("Partner:       ︳ $partnerName")
-        println("Mode:          ︳ ${this.mode}")
+        println("Mode:          ︳ ${mode ?: "Skipped"}")
         println("SDK:           ︳ $dependency")
         println("⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯")
 
@@ -67,43 +68,41 @@ class SoftPosToolsExtension(private val project:Project) {
     }
 
     private fun lookForPartnerCode(partnerCode:String?) : String?{
-        return partnerCode?.let {
-            println("Partner Code Found at Gradle Script: edfapay.softpos.install()")
-            it
-        } ?: (project.findProperty("EDFAPAY_PARTNER"))?.let {
-            project.gradle.gradleHomeDir?.absolutePath
+        return (project.findProperty("EDFAPAY_PARTNER"))?.let {
             println("Partner Code Found at Global or Project Gradle Properties '~/.gradle/gradle.properties | ./gradle.properties'")
             it as String?
         } ?: System.getenv().get("EDFAPAY_PARTNER")?.let {
             println("Partner Code Found at Environment Variable")
             it
+        } ?: partnerCode?.let {
+            println("Partner Code passed by Gradle Script to edfapay.softpos.install() or edfapay.softpos.partnerCode")
+            it
         }
     }
 
     private fun lookForSdkMode(mode:String?) : String?{
-        return mode?.let {
-            println("SDK Mode Found at Gradle Script: edfapay.softpos.mode")
-            it
-        } ?: (project.findProperty("EDFAPAY_SDK_MODE"))?.let {
-            project.gradle.gradleHomeDir?.absolutePath
+        return (project.findProperty("EDFAPAY_SDK_MODE"))?.let {
             println("SDK Mode Found at Global or Project Gradle Properties '~/.gradle/gradle.properties | ./gradle.properties'")
             it as String?
         } ?: System.getenv().get("EDFAPAY_SDK_MODE")?.let {
             println("SDK Mode Found at Environment Variable")
             it
+        } ?: mode?.let {
+            println("SDK Mode passed by Gradle Script to edfapay.softpos.mode")
+            it
         }
     }
 
     private fun lookForSdkVersion(version:String?) : String?{
-        return version?.let {
-            println("SDK Version Found at Gradle Script: edfapay.softpos.version")
-            it
-        } ?: (project.findProperty("EDFAPAY_SDK_VERSION"))?.let {
+        return (project.findProperty("EDFAPAY_SDK_VERSION"))?.let {
             project.gradle.gradleHomeDir?.absolutePath
             println("SDK Version Found at Global or Project Gradle Properties '~/.gradle/gradle.properties | ./gradle.properties'")
             it as String?
         } ?: System.getenv().get("EDFAPAY_SDK_VERSION")?.let {
             println("SDK Version Found at Environment Variable")
+            it
+        } ?: version?.let {
+            println("SDK Version passed by Gradle Script to edfapay.softpos.version")
             it
         }
     }
