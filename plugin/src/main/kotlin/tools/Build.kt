@@ -6,14 +6,17 @@ package tools
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.initialization.resolve.RepositoriesMode
 import org.gradle.api.tasks.TaskExecutionException
 import java.io.File
+import java.net.URI
 
 
 /**
  * A simple 'hello world' plugin.
  */
 
+private const val TAG = "[EdfapayPlugin]"
 class SoftPosToolsExtension(private val project:Project) {
     var partnerCode:String? = null
     var version:String? = null
@@ -23,7 +26,9 @@ class SoftPosToolsExtension(private val project:Project) {
 
     val currentTask:Task get() = project.tasks.getByName("edfapay")
 
+
     fun install(partnerCode:String?){
+
         val partnerCode_ = lookForPartnerCode(partnerCode ?: this.partnerCode) ?: throw TaskExecutionException(currentTask, Errors.invalidPartnerCodeToInstall)
         val mode = lookForSdkMode(mode)
         val version = lookForSdkVersion(version)
@@ -37,7 +42,7 @@ class SoftPosToolsExtension(private val project:Project) {
 
         when(dependency == null) {
             true -> {
-                val depStr = "com.github.edfapay.android-edfapay-softpos-sdk"
+                val depStr = "com.edfapay"
                 version?.let {
                     println("Skipping `mode` as `version` number exists...")
                     println("Installing edfapay sdk with parameters: version:$it | partnerCode:$partnerCode_")
@@ -150,13 +155,85 @@ class SoftPosToolsExtension(private val project:Project) {
     }
 }
 
-class SoftPosTools: Plugin<Project> {
+class Build: Plugin<Project> {
+    val MODULE="$TAG[build.gradle]"
+    private var project: Project? = null
+    val logger: (String) -> Unit = { msg -> project?.logger?.lifecycle(msg) }
+
     override fun apply(project: Project) {
+        this.project = project
         project.tasks.register("edfapay") { task ->
             task.extensions.add("softpos", SoftPosToolsExtension(project))
-//            project.configurations.create("implementEdfapay"){
-//                it.isCanBeResolved = true
-//            }
         }
+
+        println("$MODULE Begins")
+        logger("$MODULE Project: ${project.rootProject.name} > ${project.name}")
+
+        val repositoriesMode = project.gradle.rootProject
+            .extensions.extraProperties
+            .properties["repositoriesMode"] ?: "null, considered ${RepositoriesMode.PREFER_PROJECT.name} as default"
+
+        logger("$MODULE RepositoriesMode:$repositoriesMode")
+        if(repositoriesMode == RepositoriesMode.PREFER_SETTINGS.name
+            || repositoriesMode == RepositoriesMode.FAIL_ON_PROJECT_REPOS.name){
+            logger("$MODULE Ignore adding edfapay repository at project level build.gradle")
+            logger("$MODULE   - It may already added at settings.gradle level")
+            return
+        }
+
+
+        val task = project.tasks.getByName("edfapay")
+
+        val username = project.findProperty("PARTNER_REPO_USERNAME") ?: throw TaskExecutionException(task, Errors.missingPartnerRepoUsername)
+        val password = project.findProperty("PARTNER_REPO_PASSWORD") ?: throw TaskExecutionException(task, Errors.missingPartnerRepoUserPassword)
+
+        println("$MODULE username:$username")
+        println("$MODULE password:${maskPassword(password as String)}")
+        /*
+        /* Applying via bundled gradle script */
+        logger("$MODULE Applying edfapay.gradle to ${project.rootProject.name}")
+        project.rootProject.apply {
+            val inputStream = javaClass.classLoader.getResourceAsStream("edfapay.gradle")
+            if (inputStream != null) {
+                val tempFile = File.createTempFile("edfapay", ".gradle")
+                tempFile.writeBytes(inputStream.readAllBytes())
+                project.apply(mapOf("from" to tempFile))
+                tempFile.deleteOnExit()
+                logger("$MODULE Applied gradle file from: ${tempFile.absolutePath}")
+            }else{
+                logger("$MODULE Failed to apply edfapay repository from gradle file")
+            }
+        }
+        // */
+
+
+        // /*
+        /* Applying via plugin itself */
+        logger("$MODULE Adding edfapay repository to project")
+        project.rootProject.allprojects{
+            it.repositories.apply {
+                logger("$MODULE   - ${it.name}")
+
+                maven { repository ->
+                    repository.url = URI("https://build.edfapay.com/nexus/content/repositories/edfapay-mobile/")
+                    repository.isAllowInsecureProtocol = true
+                    repository.credentials { credentials ->
+                        credentials.username = username as String
+                        credentials.password = password as String
+                    }
+                }
+            }
+        }
+        // */
     }
 }
+
+private fun maskPassword(text: String, visibleStart: Int = 1, visibleEnd: Int = 1): String {
+    if (text.length <= visibleStart + visibleEnd) return "*".repeat(text.length)
+
+    val start = text.take(visibleStart)
+    val end = text.takeLast(visibleEnd)
+    val masked = "*".repeat(text.length - visibleStart - visibleEnd)
+    return start + masked + end
+}
+

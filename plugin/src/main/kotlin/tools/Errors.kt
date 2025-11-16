@@ -43,6 +43,34 @@ Please configure the partner code at one of the above.
   - Messenger: +966500409598 (WhatsApp Only) 
 """)
 
+    val missingPartnerRepoUsername = Exception(
+        """
+Partner repository access username is not configured to property named `PARTNER_REPO_USERNAME` at below:"
+- System Environment Variable
+- ~/.gradle/gradle.properties (project level gradle properties)
+- ./gradle.properties (global gradle properties)
+Please define the PARTNER_REPO_USERNAME at one of the above. 
+
+- Please contact EdfaPay Administration or Sales for the correct partner code generated for your.
+ - Contact Detail:
+  - Email: info@edfapay.com/zohaib.kambrani@edfapay.com
+  - Messenger: +966500409598 (WhatsApp Only) 
+""")
+
+    val missingPartnerRepoUserPassword = Exception(
+        """
+Partner repository access username is not configured to property named `PARTNER_REPO_PASSWORD` at below:"
+- System Environment Variable
+- ~/.gradle/gradle.properties (project level gradle properties)
+- ./gradle.properties (global gradle properties)
+Please define the PARTNER_REPO_PASSWORD at one of the above. 
+
+- Please contact EdfaPay Administration or Sales for the correct partner code generated for your.
+ - Contact Detail:
+  - Email: info@edfapay.com/zohaib.kambrani@edfapay.com
+  - Messenger: +966500409598 (WhatsApp Only) 
+""")
+
     val invalidSdkVersionOrModeToInstall = Exception(
         """
 SDK Version or Mode is not configured to variable or property named `EDFAPAY_SDK_VERSION or EDFAPAY_SDK_MODE` at below:"

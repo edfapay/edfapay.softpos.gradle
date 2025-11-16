@@ -9,7 +9,7 @@
 plugins {
     id 'java-gradle-plugin' // Apply the Java Gradle plugin development plugin to add support for developing Gradle plugins
     id 'org.jetbrains.kotlin.jvm' version '1.6.21' // Apply the Kotlin JVM plugin to add support for Kotlin.
-    id 'com.gradle.plugin-publish' version '1.2.1' // Apply gradle publish plugin
+    id 'com.gradle.plugin-publish' version '2.0.0' // Apply gradle publish plugin
     id 'maven-publish'
 }
 
@@ -37,10 +37,6 @@ dependencies {
 }
 
 
-group = 'com.edfapay.softpos'
-version = '1.0.1'
-
-
 
 pluginBundle {
     website = 'https://edfapay.com'
@@ -51,11 +47,13 @@ pluginBundle {
 gradlePlugin {
     // Define the plugin
     plugins {
-        tools {
-            id = 'com.edfapay.softpos.tools'
-            displayName = 'EdfaPay gradle tools plugins'
-            description = 'EdfaPay gradle tools plugins.'
-            implementationClass = 'tools.SoftPosTools'
+        build {
+            group = 'edfapay.build'
+            version = edfapay_gradle_plugin_version
+            id = 'edfapay.build'
+            displayName = 'EdfaPay gradle tools plugin'
+            description = 'EdfaPay gradle tools plugin.'
+            implementationClass = 'tools.Build'
         }
     }
 }

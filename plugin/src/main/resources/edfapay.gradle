@@ -1,0 +1,16 @@
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        mavenLocal()
+        maven {
+
+            url "https://build.edfapay.com/nexus/content/repositories/edfapay-mobile/"
+            allowInsecureProtocol = true
+            credentials {
+                username = findProperty("PARTNER_REPO_USERNAME")
+                password = findProperty("PARTNER_REPO_PASSWORD")
+            }
+        }
+    }
+}
