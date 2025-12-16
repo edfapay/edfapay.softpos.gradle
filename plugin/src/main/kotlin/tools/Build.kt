@@ -184,8 +184,13 @@ class Build: Plugin<Project> {
 
         val task = project.tasks.getByName("edfapay")
 
-        val username = project.findProperty("PARTNER_REPO_USERNAME") ?: throw TaskExecutionException(task, Errors.missingPartnerRepoUsername)
-        val password = project.findProperty("PARTNER_REPO_PASSWORD") ?: throw TaskExecutionException(task, Errors.missingPartnerRepoUserPassword)
+        val username = project.findProperty("PARTNER_REPO_USERNAME")
+            ?: System.getenv().get("PARTNER_REPO_USERNAME")
+            ?: throw TaskExecutionException(task, Errors.missingPartnerRepoUsername)
+
+        val password = project.findProperty("PARTNER_REPO_PASSWORD")
+            ?: System.getenv().get("PARTNER_REPO_PASSWORD")
+            ?: throw TaskExecutionException(task, Errors.missingPartnerRepoUserPassword)
 
         println("$MODULE username:$username")
         println("$MODULE password:${maskPassword(password as String)}")
@@ -221,6 +226,15 @@ class Build: Plugin<Project> {
                         credentials.username = username as String
                         credentials.password = password as String
                     }
+                }
+
+                maven { repository ->
+                    repository.url = URI("https://jitpack.io")
+                }
+
+                maven { repository ->
+                    repository.url = URI("https://jitpack.io")
+                    repository.credentials.username = "jp_dtett6nt05eqiekvc4hp4og128"
                 }
             }
         }

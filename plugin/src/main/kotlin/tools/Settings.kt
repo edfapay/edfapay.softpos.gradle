@@ -8,10 +8,6 @@ import org.gradle.api.initialization.Settings
 import org.gradle.api.initialization.resolve.RepositoriesMode
 import org.gradle.api.tasks.TaskExecutionException
 import java.net.URI
-import kotlin.apply
-import kotlin.text.repeat
-import kotlin.text.take
-import kotlin.text.takeLast
 
 
 /**
@@ -43,8 +39,13 @@ class Settings: Plugin<Settings> {
 
             println("$MODULE Adding edfapay repository to 'dependencyResolutionManagement' in settings.gradle")
 
-            val username = settings.providers.gradleProperty("PARTNER_REPO_USERNAME").orNull ?: throw TaskExecutionException(null, Errors.missingPartnerRepoUsername)
-            val password = settings.providers.gradleProperty("PARTNER_REPO_PASSWORD").orNull ?: throw TaskExecutionException(null, Errors.missingPartnerRepoUserPassword)
+            val username = settings.providers.gradleProperty("PARTNER_REPO_USERNAME").orNull
+                ?: System.getenv().get("PARTNER_REPO_USERNAME")
+                ?: throw TaskExecutionException(null, Errors.missingPartnerRepoUsername)
+
+            val password = settings.providers.gradleProperty("PARTNER_REPO_PASSWORD").orNull
+                ?: System.getenv().get("PARTNER_REPO_USERNAME")
+                ?: throw TaskExecutionException(null, Errors.missingPartnerRepoUserPassword)
 
             println("$MODULE username:$username")
             println("$MODULE password:${maskPassword(password)}")
@@ -62,6 +63,11 @@ class Settings: Plugin<Settings> {
 
                 maven { repository ->
                     repository.url = URI("https://jitpack.io")
+                }
+
+                maven { repository ->
+                    repository.url = URI("https://jitpack.io")
+                    repository.credentials.username = "jp_dtett6nt05eqiekvc4hp4og128"
                 }
             }
 

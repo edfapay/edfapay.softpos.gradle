@@ -5,7 +5,6 @@
  * For more details take a look at the Writing Custom Plugins chapter in the Gradle
  * User Manual available at https://docs.gradle.org/7.5/userguide/custom_plugins.html
  */
-
 plugins {
     id 'java-gradle-plugin' // Apply the Java Gradle plugin development plugin to add support for developing Gradle plugins
     id 'org.jetbrains.kotlin.jvm' version '1.6.21' // Apply the Kotlin JVM plugin to add support for Kotlin.
@@ -22,21 +21,17 @@ repositories {
 
 dependencies {
     implementation gradleTestKit()
-
-    // Align versions of all Kotlin components
     implementation platform('org.jetbrains.kotlin:kotlin-bom')
-
-    // Use the Kotlin JDK 8 standard library.
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
-
-    // Use the Kotlin test library.
     testImplementation 'org.jetbrains.kotlin:kotlin-test'
-
-    // Use the Kotlin JUnit integration.
     testImplementation 'org.jetbrains.kotlin:kotlin-test-junit'
 }
 
 
+
+
+group = 'com.edfapay'
+version = "2.0.1"
 
 pluginBundle {
     website = 'https://edfapay.com'
@@ -45,25 +40,18 @@ pluginBundle {
 }
 
 gradlePlugin {
-    // Define the plugin
     plugins {
+        settings {
+            id = 'com.edfapay.softpos.settings'
+            displayName = 'EdfaPay repository plugin'
+            description = 'A Gradle settings plugin that automatically configures your project\'s repositories. It centralizes repository management by adding the Edfapay private repository access, This can be disabled by setting repositoriesMode to PREFER_PROJECT.'
+            implementationClass = 'tools.Settings'
+        }
         build {
-            group = 'edfapay.build'
-            version = edfapay_gradle_plugin_version
-            id = 'edfapay.build'
+            id = 'com.edfapay.softpos.build'
             displayName = 'EdfaPay gradle tools plugin'
-            description = 'EdfaPay gradle tools plugin.'
+            description = 'A Gradle plugin that configures your project to use Edfapay\'s private repository and helps to configure Edfapay SDK dependencies'
             implementationClass = 'tools.Build'
         }
     }
 }
-
-
-/*
-Files will be download plugin
--------------------------------
-https://plugins.gradle.org/m2/com/edfapay/softpos/plugin/0.0.5/plugin-0.0.5.pom
-https://plugins.gradle.org/m2/com/edfapay/softpos/plugin/0.0.5/plugin-0.0.5.module
-https://plugins.gradle.org/m2/com/edfapay/softpos/plugin/0.0.5/plugin-0.0.5.jar
-https://plugins.gradle.org/m2/com/edfapay/softpos/plugin/0.0.5/plugin-0.0.5-sources.jar
-* */

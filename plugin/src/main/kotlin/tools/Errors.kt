@@ -51,23 +51,22 @@ Partner repository access username is not configured to property named `PARTNER_
 - ./gradle.properties (global gradle properties)
 Please define the PARTNER_REPO_USERNAME at one of the above. 
 
-- Please contact EdfaPay Administration or Sales for the correct partner code generated for your.
+- Please contact EdfaPay Administration or Sales for the correct partner details.
  - Contact Detail:
-  - Email: info@edfapay.com/zohaib.kambrani@edfapay.com
+  - Email: info@edfapay.com, zohaib.kambrani@edfapay.com
   - Messenger: +966500409598 (WhatsApp Only) 
 """)
 
     val missingPartnerRepoUserPassword = Exception(
         """
-Partner repository access username is not configured to property named `PARTNER_REPO_PASSWORD` at below:"
-- System Environment Variable
+Partner repository access password is not configured to property named `PARTNER_REPO_PASSWORD` at below:"
 - ~/.gradle/gradle.properties (project level gradle properties)
 - ./gradle.properties (global gradle properties)
 Please define the PARTNER_REPO_PASSWORD at one of the above. 
 
-- Please contact EdfaPay Administration or Sales for the correct partner code generated for your.
+- Please contact EdfaPay Administration or Sales for the correct partner details.
  - Contact Detail:
-  - Email: info@edfapay.com/zohaib.kambrani@edfapay.com
+  - Email: info@edfapay.com, zohaib.kambrani@edfapay.com
   - Messenger: +966500409598 (WhatsApp Only) 
 """)
 
